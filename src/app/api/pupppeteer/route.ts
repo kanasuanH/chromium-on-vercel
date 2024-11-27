@@ -1,5 +1,4 @@
-import puppeteer from 'puppeteer-core';
-import chrome from 'chrome-aws-lambda';
+import puppeteer from "puppeteer";
 import { NextResponse } from 'next/server';
 
 export async function POST(req: Request) {
@@ -9,15 +8,14 @@ export async function POST(req: Request) {
     if (!htmlContent) {
       return NextResponse.json({ error: 'HTML content is required' }, { status: 400 });
     }
-
-    let browser = null;
-    try {
-      browser = await puppeteer.launch({
-        executablePath: await chrome.executablePath,
-        args: chrome.args,
-        headless: chrome.headless,
+      const install = require(`puppeteer/internal/node/install.js`).downloadBrowser;
+      await install();
+    
+      const browser = await puppeteer.launch({
+        args: ["--use-gl=angle", "--use-angle=swiftshader", "--single-process", "--no-sandbox"],
+        headless: true,
       });
-
+    
       const page = await browser.newPage();
       await page.setContent(htmlContent, { waitUntil: 'load' });
       await page.emulateMediaType('print');
@@ -39,13 +37,6 @@ export async function POST(req: Request) {
       });
 
       return response;
-    } catch (error) {
-      console.error('Error generating PDF:', error);
-      if (browser) {
-        await browser.close();
-      }
-      return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
-    }
   } catch (error) {
     return NextResponse.json({ error: 'Invalid request format' }, { status: 400 });
   }
