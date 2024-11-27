@@ -41,3 +41,8 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: 'Invalid request format' }, { status: 400 });
   }
 }
+
+
+export async function GET(req: Request) {
+  return NextResponse.json({ Data: 'It work' }, { status: 200 });
+}
