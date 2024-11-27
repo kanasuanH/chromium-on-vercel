@@ -5,44 +5,45 @@ export const dynamic = 'force-dynamic' // defaults to auto
 
 export async function POST(req: Request) {
   console.log("RUN POST")
-  try {
-    const { htmlContent } = await req.json();
+  return NextResponse.json({ Data: 'It work' }, { status: 200 });
+  // try {
+  //   const { htmlContent } = await req.json();
 
-    if (!htmlContent) {
-      return NextResponse.json({ error: 'HTML content is required' }, { status: 400 });
-    }
-      const install = require(`puppeteer/internal/node/install.js`).downloadBrowser;
-      await install();
+  //   if (!htmlContent) {
+  //     return NextResponse.json({ error: 'HTML content is required' }, { status: 400 });
+  //   }
+  //     const install = require(`puppeteer/internal/node/install.js`).downloadBrowser;
+  //     await install();
     
-      const browser = await puppeteer.launch({
-        args: ["--use-gl=angle", "--use-angle=swiftshader", "--single-process", "--no-sandbox"],
-        headless: true,
-      });
+  //     const browser = await puppeteer.launch({
+  //       args: ["--use-gl=angle", "--use-angle=swiftshader", "--single-process", "--no-sandbox"],
+  //       headless: true,
+  //     });
     
-      const page = await browser.newPage();
-      await page.setContent(htmlContent, { waitUntil: 'load' });
-      await page.emulateMediaType('print');
+  //     const page = await browser.newPage();
+  //     await page.setContent(htmlContent, { waitUntil: 'load' });
+  //     await page.emulateMediaType('print');
 
-      const pdfBuffer = await page.pdf({
-        format: 'A4',
-        printBackground: true,
-      });
+  //     const pdfBuffer = await page.pdf({
+  //       format: 'A4',
+  //       printBackground: true,
+  //     });
 
-      await page.close();
-      await browser.close();
+  //     await page.close();
+  //     await browser.close();
 
-      const response = new NextResponse(pdfBuffer, {
-        status: 200,
-        headers: {
-          'Content-Type': 'application/pdf',
-          'Content-Disposition': 'attachment; filename=output.pdf',
-        },
-      });
+  //     const response = new NextResponse(pdfBuffer, {
+  //       status: 200,
+  //       headers: {
+  //         'Content-Type': 'application/pdf',
+  //         'Content-Disposition': 'attachment; filename=output.pdf',
+  //       },
+  //     });
 
-      return response;
-  } catch (error) {
-    return NextResponse.json({ error: 'Invalid request format' }, { status: 400 });
-  }
+  //     return response;
+  // } catch (error) {
+  //   return NextResponse.json({ error: 'Invalid request format' }, { status: 400 });
+  // }
 }
 
 
