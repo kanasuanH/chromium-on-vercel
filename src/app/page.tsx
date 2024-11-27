@@ -1,3 +1,4 @@
+"use client"
 import puppeteer from "puppeteer";
 
 export default function Home() {
