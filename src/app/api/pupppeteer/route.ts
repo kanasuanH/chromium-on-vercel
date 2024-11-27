@@ -1,48 +1,52 @@
-import puppeteer, { Browser, Page } from 'puppeteer';
-import { NextApiRequest, NextApiResponse } from 'next';
+import puppeteer from 'puppeteer-core';
+import chrome from 'chrome-aws-lambda';
+import { NextResponse } from 'next/server';
 
-export default async function handler(req: NextApiRequest, res: NextApiResponse) {
-  if (req.method !== 'POST') {
-    return res.status(405).json({ error: 'Method Not Allowed' });
-  }
-
-  const { htmlContent } = req.body;
-
-  if (!htmlContent) {
-    return res.status(400).json({ error: 'HTML content is required' });
-  }
-
-  let browser: Browser | null = null;
+export async function POST(req: Request) {
   try {
-    browser = await puppeteer.launch({
-      args: ['--use-gl=angle', '--use-angle=swiftshader', '--single-process', '--no-sandbox'],
-      headless: true,
-    });
+    const { htmlContent } = await req.json();
 
-    const page: Page = await browser.newPage();
-
-    // Set content
-    await page.setContent(htmlContent, { waitUntil: 'load' });
-    await page.emulateMediaType('print');
-
-    // Generate PDF buffer
-    const pdfBuffer = await page.pdf({
-      format: 'A4',
-      printBackground: true,
-    });
-
-    await page.close();
-    await browser.close();
-
-    // Send PDF as response
-    res.setHeader('Content-Type', 'application/pdf');
-    res.setHeader('Content-Disposition', 'attachment; filename=output.pdf');
-    res.status(200).send(pdfBuffer);
-  } catch (error) {
-    console.error('Error generating PDF:', error);
-    if (browser) {
-      await browser.close();
+    if (!htmlContent) {
+      return NextResponse.json({ error: 'HTML content is required' }, { status: 400 });
     }
-    res.status(500).json({ error: 'Internal Server Error' });
+
+    let browser = null;
+    try {
+      browser = await puppeteer.launch({
+        executablePath: await chrome.executablePath,
+        args: chrome.args,
+        headless: chrome.headless,
+      });
+
+      const page = await browser.newPage();
+      await page.setContent(htmlContent, { waitUntil: 'load' });
+      await page.emulateMediaType('print');
+
+      const pdfBuffer = await page.pdf({
+        format: 'A4',
+        printBackground: true,
+      });
+
+      await page.close();
+      await browser.close();
+
+      const response = new NextResponse(pdfBuffer, {
+        status: 200,
+        headers: {
+          'Content-Type': 'application/pdf',
+          'Content-Disposition': 'attachment; filename=output.pdf',
+        },
+      });
+
+      return response;
+    } catch (error) {
+      console.error('Error generating PDF:', error);
+      if (browser) {
+        await browser.close();
+      }
+      return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
+    }
+  } catch (error) {
+    return NextResponse.json({ error: 'Invalid request format' }, { status: 400 });
   }
 }
