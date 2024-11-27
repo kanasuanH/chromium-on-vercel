@@ -1,11 +1,46 @@
 import puppeteer from "puppeteer";
 import { NextResponse } from 'next/server';
 
-export const dynamic = 'force-dynamic' // defaults to auto
+export const dynamic = 'force-dynamic'
 
 export async function POST(req: Request) {
-  console.log("RUN POST")
-  return NextResponse.json({ Data: 'It work' }, { status: 200 });
+  try{
+    const install = require(`puppeteer/internal/node/install.js`).downloadBrowser;
+    await install();
+  
+    const browser = await puppeteer.launch({
+      args: ["--use-gl=angle", "--use-angle=swiftshader", "--single-process", "--no-sandbox"],
+      headless: true,
+    });
+  
+    const page = await browser.newPage();
+
+    const htmlContent = `<html><body><h1>Your PDF Content</h1></body></html>`
+  
+    await page.setContent(htmlContent, { waitUntil: 'load' });
+
+    const pdfBuffer = await page.pdf({
+      format: 'A4',
+      printBackground: true,
+    });
+  
+    await page.close();
+    await browser.close();
+
+      const response = new NextResponse(pdfBuffer, {
+        status: 200,
+        headers: {
+          'Content-Type': 'application/pdf',
+          'Content-Disposition': 'attachment; filename=output.pdf',
+        },
+      });
+
+      return response;
+
+      
+  } catch (error) {
+    return NextResponse.json({ error: 'Invalid request format' }, { status: 400 });
+  }
   // try {
   //   const { htmlContent } = await req.json();
 
@@ -46,7 +81,3 @@ export async function POST(req: Request) {
   // }
 }
 
-
-export async function GET() {
-  return NextResponse.json({ Data: 'It work' }, { status: 200 });
-}
