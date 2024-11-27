@@ -5,7 +5,7 @@ import React from 'react';
 const DownloadPdf: React.FC = () => {
   const downloadPdf = async () => {
     try {
-      const response = await fetch('/api/generate-pdf', {
+      const response = await fetch('/api/puppeteer', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
