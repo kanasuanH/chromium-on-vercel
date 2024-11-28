@@ -9,20 +9,20 @@ export async function POST(req: Request) {
     const install = require(`puppeteer/internal/node/install.js`).downloadBrowser;
     await install();
   
-    const browser = await puppeteer.launch({
-      args: ["--use-gl=angle", "--use-angle=swiftshader", "--single-process", "--no-sandbox"],
-      headless: true,
-    });
+    // const browser = await puppeteer.launch({
+    //   args: ["--use-gl=angle", "--use-angle=swiftshader", "--single-process", "--no-sandbox"],
+    //   headless: true,
+    // });
   
-    const page = await browser.newPage();
+    // const page = await browser.newPage();
   
-    const url = `https://news.ycombinator.com`;
-    await page.goto(url);
+    // const url = `https://news.ycombinator.com`;
+    // await page.goto(url);
   
-    const [image, title] = await Promise.all([page.screenshot(), page.title()]);
+    // const [image, title] = await Promise.all([page.screenshot(), page.title()]);
   
-    await page.close();
-    await browser.close();
+    // await page.close();
+    // await browser.close();
 
     return NextResponse.json({ error: 'It run' }, { status: 200 });
     
