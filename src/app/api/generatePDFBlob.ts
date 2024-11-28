@@ -1,5 +1,7 @@
 import puppeteer from "puppeteer";
 
+export const maxDuration = 60;
+
 export default async function generatePDFBlob() {
     const install = require(`puppeteer/internal/node/install.js`).downloadBrowser;
     await install();
