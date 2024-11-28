@@ -1,6 +1,6 @@
 
 import { NextResponse } from 'next/server';
-import { generatePDFBlob } from ./generatePDFBlob;
+import { generatePDFBlob } from './generatePDFBlob';
 
 export const maxDuration = 60;
 export const dynamic = 'force-dynamic'
