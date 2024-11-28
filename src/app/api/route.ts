@@ -6,8 +6,8 @@ export const dynamic = 'force-dynamic'
 
 export async function POST(req: Request) {
   try{
-    const install = require(`puppeteer/internal/node/install.js`).downloadBrowser;
-    await install();
+    // const install = require(`puppeteer/internal/node/install.js`).downloadBrowser;
+    // await install();
   
     // const browser = await puppeteer.launch({
     //   args: ["--use-gl=angle", "--use-angle=swiftshader", "--single-process", "--no-sandbox"],
